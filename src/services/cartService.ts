@@ -47,7 +47,7 @@ export const getActiveCartForUser = async( {userID}: ICartForUser) => {
 // Delete all items feom cart
 
 interface DeleteAll {
-    userID: string
+    userID: string,
 }
 
 export const deleteAllItems = async({userID}: DeleteAll) =>{
@@ -59,9 +59,35 @@ export const deleteAllItems = async({userID}: DeleteAll) =>{
 } 
 
 
+// ==============================================
+// Delete item feom cart
 
+interface Deleteitem {
+    userID: string,
+    productId: any
+}
 
+export const deleteItemFromCart = async({userID, productId}: Deleteitem) =>{
+    const cart = await getActiveCartForUser({userID});
+    console.log("productId =", productId);
+    const existsInCart = cart.items.find( (p) => p.product.toString() === productId)
+    
+    if(!existsInCart){
+        return {data: "Item not exists", status: 400}
+    }
 
+    const otherCartItems = cart.items.filter( (p)=> p.product.toString() !== productId);
+
+    let total = otherCartItems.reduce( (sum, product) => {
+        return sum + (product.quantity * product.unitPrice);
+
+    },0)
+
+    cart.items = otherCartItems;
+    cart.total = total;
+    const update = await cart.save();
+    return {data: update, status: 200}
+} 
 
 
 // ==============================================

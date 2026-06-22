@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllCarts, deleteAllCarts, getActiveCartForUser, addItemToCart, updateItemToCart, deleteAllItems } from '../services/cartService'
+import { getAllCarts, deleteAllCarts, getActiveCartForUser, addItemToCart, updateItemToCart, deleteItemFromCart, deleteAllItems } from '../services/cartService'
 import { validateJWT } from '../middleware/validateJWT';
 import { ExtendRequest } from '../types/extendedRequest';
 
@@ -31,8 +31,8 @@ router.get('/', validateJWT, async (req: ExtendRequest, res) => {
 })
 
 
-// Add product to cart
-router.post('/item', validateJWT, async(req: ExtendRequest,res) => {
+// Add item to cart
+router.post('/cart/item', validateJWT, async(req: ExtendRequest,res) => {
     // userID, cartID, productDetails
     const userID = req?.user?._id;
     const {productId, quantity} = req.body;
@@ -40,14 +40,22 @@ router.post('/item', validateJWT, async(req: ExtendRequest,res) => {
     res.send(item);
 }) 
 
-// Update product in cart
-router.put('/item', validateJWT, async(req: ExtendRequest,res) => {
+// Update item in cart
+router.put('/cart/item', validateJWT, async(req: ExtendRequest,res) => {
     // userID, cartID, productDetails
     const userID = req?.user?._id;
     const {productId, quantity} = req.body;
     const item = await updateItemToCart({userID, productId, quantity});
     res.send(item);
 }) 
+
+// Delete item from cart
+router.delete('/cart/item/:id', validateJWT,async(req: ExtendRequest,res)=>{
+    const userID = req?.user?._id;
+    const productId = req.params.id;
+    const item = await deleteItemFromCart({userID, productId});
+    res.send(item);   
+})
 
 // Delete all items from cart
 router.delete('/cart', validateJWT,async(req: ExtendRequest,res) =>{
