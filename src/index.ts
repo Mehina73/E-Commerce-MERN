@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes';
 import productRoutes from './routes/productRoutes';
+import cartRoutes from './routes/cartRoutes';
 
 const app = express();
 const port = 3001;
@@ -14,7 +15,7 @@ mongoose.connect("mongodb://localhost:27017/ecommerce")
 
 app.use(userRoutes);
 app.use(productRoutes);
-
+app.use(cartRoutes)
 
 app.listen(port,()=>{
     console.log("Server is running on port " + port)

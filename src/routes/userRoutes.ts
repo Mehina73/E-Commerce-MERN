@@ -21,9 +21,14 @@ router.post('/register', async (req,res)=>{
 
 // Login a user
 router.post('/login', async (req,res) => {
-    const {email, password}= req.body
-    const result = await userLogin({email, password});
-    res.send(result.data).status(result.status);
+    try{
+        const {email, password}= req.body
+        const result = await userLogin({email, password});
+        res.send(result.data).status(result.status);
+    }catch(err){
+        res.send("Invalid Email or Password")
+    }
+
 })
 
 export default router;
