@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllCarts, deleteAllCarts, getActiveCartForUser, addItemToCart, updateItemToCart } from '../services/cartService'
+import { getAllCarts, deleteAllCarts, getActiveCartForUser, addItemToCart, updateItemToCart, deleteAllItems } from '../services/cartService'
 import { validateJWT } from '../middleware/validateJWT';
 import { ExtendRequest } from '../types/extendedRequest';
 
@@ -49,6 +49,12 @@ router.put('/item', validateJWT, async(req: ExtendRequest,res) => {
     res.send(item);
 }) 
 
+// Delete all items from cart
+router.delete('/cart', validateJWT,async(req: ExtendRequest,res) =>{
+    const userID = req?.user?._id;
+    const item = await deleteAllItems({userID});
+    res.send(item);
+})
 
 // // Get cart
 // router.get('/cart/:id')

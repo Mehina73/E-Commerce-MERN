@@ -43,13 +43,36 @@ export const getActiveCartForUser = async( {userID}: ICartForUser) => {
 
     return cart;
 }
+// ==============================================
+// Delete all items feom cart
+
+interface DeleteAll {
+    userID: string
+}
+
+export const deleteAllItems = async({userID}: DeleteAll) =>{
+    const cart = await getActiveCartForUser({userID});
+    cart.items = [];
+    cart.total = 0;
+    const update = await cart.save();
+    return {data: update, status: 200}
+} 
 
 
+
+
+
+
+
+// ==============================================
+// Add item in cart 
 interface ItemInCart{
     userID: string, 
     productId: string, 
     quantity: number
 }
+
+
 
 export const addItemToCart = async({userID, productId, quantity}: ItemInCart) => {
     
@@ -82,7 +105,8 @@ export const addItemToCart = async({userID, productId, quantity}: ItemInCart) =>
 
 }
 
-
+// ==============================================
+// Update item in cart
 
 export const updateItemToCart = async({userID, productId, quantity}: ItemInCart) => {
     
