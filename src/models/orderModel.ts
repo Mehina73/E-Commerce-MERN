@@ -2,22 +2,22 @@ import mongoose, {Schema, Document} from "mongoose";
 
 
 
-interface IOrderItems extends Document{
+export interface IOrderItem {
     productName: string,
     productImage: string,
     unitPrice: number,
     quantity: number
 }
 
-interface IOrder extends Document{
-    orderItems: IOrderItems[],
+export interface IOrder extends Document{
+    orderItems: IOrderItem[],
     total: number,
     address: string,
     userID: string | object
 }
 
 
-const OrderItemsSchema = new Schema<IOrderItems>({
+const OrderItemsSchema = new Schema<IOrderItem>({
     productName: { type: String, required: true },
     productImage: { type: String, required: true },
     unitPrice: { type: Number, required: true },
