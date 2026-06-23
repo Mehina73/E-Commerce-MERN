@@ -63,5 +63,5 @@ export const userLogin = async (loginData: ILoginData) =>{
 
 
 const generateJWT = (data: any) =>{
-    return jwt.sign(data, "gfdsgdsfsdsfsdfsdfsdfsdsdfwefe746fw26fw", {expiresIn:'24h'})
+    return jwt.sign(data, process.env.JWT_SECRETE || "", {expiresIn:'24h'})
 }
