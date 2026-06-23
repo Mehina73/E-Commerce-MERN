@@ -25,52 +25,88 @@ const router = express.Router();
 // Get active cart
 router.get('/', validateJWT, async (req: ExtendRequest, res) => {
     // TO DO: get userID from token once loged in
-    const userID = req?.user?._id;
-    const cart = await getActiveCartForUser({userID});
-    res.send(cart);
+    try {
+        const userID = req?.user?._id;
+        const cart = await getActiveCartForUser({ userID });
+        res.send(cart);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
+
 })
 
 
 // Add item to cart
-router.post('/cart/item', validateJWT, async(req: ExtendRequest,res) => {
+router.post('/cart/item', validateJWT, async (req: ExtendRequest, res) => {
     // userID, cartID, productDetails
-    const userID = req?.user?._id;
-    const {productId, quantity} = req.body;
-    const item = await addItemToCart({userID, productId, quantity});
-    res.send(item);
-}) 
+    try {
+        const userID = req?.user?._id;
+        const { productId, quantity } = req.body;
+        const item = await addItemToCart({ userID, productId, quantity });
+        res.send(item);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
+
+})
 
 // Update item in cart
-router.put('/cart/item', validateJWT, async(req: ExtendRequest,res) => {
+router.put('/cart/item', validateJWT, async (req: ExtendRequest, res) => {
     // userID, cartID, productDetails
-    const userID = req?.user?._id;
-    const {productId, quantity} = req.body;
-    const item = await updateItemToCart({userID, productId, quantity});
-    res.send(item);
-}) 
+    try {
+        const userID = req?.user?._id;
+        const { productId, quantity } = req.body;
+        const item = await updateItemToCart({ userID, productId, quantity });
+        res.send(item);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
+
+})
 
 // Delete item from cart
-router.delete('/cart/item/:id', validateJWT,async(req: ExtendRequest,res)=>{
-    const userID = req?.user?._id;
-    const productId = req.params.id;
-    const item = await deleteItemFromCart({userID, productId});
-    res.send(item);   
+router.delete('/cart/item/:id', validateJWT, async (req: ExtendRequest, res) => {
+    try {
+        const userID = req?.user?._id;
+        const productId = req.params.id;
+        const item = await deleteItemFromCart({ userID, productId });
+        res.send(item);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
+
 })
 
 // Delete all items from cart
-router.delete('/cart', validateJWT,async(req: ExtendRequest,res) =>{
-    const userID = req?.user?._id;
-    const item = await deleteAllItems({userID});
-    res.send(item);
+router.delete('/cart', validateJWT, async (req: ExtendRequest, res) => {
+    try {
+        const userID = req?.user?._id;
+        const item = await deleteAllItems({ userID });
+        res.send(item);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
+
 })
 
 
 // checkout
-router.post('/cart/checkout', validateJWT, async(req: ExtendRequest,res)=>{
-    const { address }  = req.body
-    const userID = req?.user?._id;
-    const response = await checkout({userID, address});
-    res.status(response.statusCode).send(response.data);
+router.post('/cart/checkout', validateJWT, async (req: ExtendRequest, res) => {
+
+    try {
+        const { address } = req.body
+        const userID = req?.user?._id;
+        const response = await checkout({ userID, address });
+        res.status(response.statusCode).send(response.data);
+    } catch (err) {
+        res.send("Something went wrong").status(500)
+    }
+
 })
 
 // // Get cart
