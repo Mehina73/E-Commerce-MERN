@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
     const [user, setUser] = useState({
@@ -20,6 +21,7 @@ const RegisterPage = () => {
 
 
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUser({
@@ -68,6 +70,7 @@ const RegisterPage = () => {
 
 
             login(user.email, token);
+            navigate('/');
 
 
 

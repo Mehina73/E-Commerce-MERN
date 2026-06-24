@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
-import { Tabs, Tab } from "@mui/material";
+import { Tabs, Tab, Button } from "@mui/material";
 import Slide from "@mui/material/Slide";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,8 +15,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LaptopMacIcon from "@mui/icons-material/LaptopMac";
 import { useAuth } from "../context/Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function HideOnScroll(props: { children: React.ReactElement }) {
+
 
   const { children } = props;
   const trigger = useScrollTrigger();
@@ -29,6 +31,19 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 }
 
 function ResponsiveAppBar(props: any) {
+  const { username, token, isAuthenticated } = useAuth();
+  console.log("From nav", { username, token })
+  const navigate = useNavigate();
+
+  const handleLogin = () =>{
+    navigate('/login')
+  }
+
+  const handleHome = () =>{
+    navigate('/')
+  }
+
+
 
 
   return (
@@ -82,7 +97,7 @@ function ResponsiveAppBar(props: any) {
                   indicatorColor="secondary"
                   value={false}
                 >
-                  <Tab label="Home" />
+                  <Tab onClick={handleHome} label="Home" />
                   <Tab label="Products" />
                   <Tab label="Categories" />
                   <Tab label="Offers" />
@@ -97,17 +112,27 @@ function ResponsiveAppBar(props: any) {
                   gap: 2,
                 }}
               >
-                <Tooltip title="Cart">
-                  <IconButton color="inherit">
-                    <ShoppingCartIcon />
-                  </IconButton>
-                </Tooltip>
+                {isAuthenticated ? (
+                  <>
+                    <Tooltip title="Cart">
+                      <IconButton color="inherit">
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Tooltip>
 
-                <Tooltip title="Profile">
-                  <IconButton sx={{ p: 0 }}>
-                    <Avatar alt="profile" src="/profile.jpg" />
-                  </IconButton>
-                </Tooltip>
+                    <Tooltip title="Profile">
+                      <>
+                        <Typography>{username}</Typography>
+                        <IconButton sx={{ p: 0 }}>
+                          <Avatar alt="profile" src="/profile.jpg" />
+
+                        </IconButton>
+                      </>
+                    </Tooltip>
+                  </>) : (
+                    <Button onClick={handleLogin}>Login</Button>
+                )}
+
               </Box>
 
             </Toolbar>

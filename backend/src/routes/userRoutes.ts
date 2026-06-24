@@ -9,7 +9,7 @@ router.post('/register', async (req,res)=>{
     try{
         const {firstName, lastName, email, password} = req.body;
         const result = await userRegister({firstName, lastName, email, password})
-        res.json(result.data).status(result.status)
+        res.status(result.status).json(result);
     } catch(err){
         throw new Error(`Error registering user: ${err}`);
     }
@@ -24,7 +24,7 @@ router.post('/login', async (req,res) => {
     try{
         const {email, password}= req.body
         const result = await userLogin({email, password});
-        res.json(result.data).status(result.status);
+        res.status(result.status).json(result);
     }catch(err){
         res.send("Invalid Email or Password")
     }
