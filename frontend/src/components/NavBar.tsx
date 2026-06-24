@@ -14,8 +14,10 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LaptopMacIcon from "@mui/icons-material/LaptopMac";
+import { useAuth } from "../context/Auth/AuthContext";
 
 function HideOnScroll(props: { children: React.ReactElement }) {
+
   const { children } = props;
   const trigger = useScrollTrigger();
 
@@ -27,6 +29,8 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 }
 
 function ResponsiveAppBar(props: any) {
+
+
   return (
     <>
       <CssBaseline />
