@@ -31,13 +31,19 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 }
 
 function ResponsiveAppBar(props: any) {
-  const { username, token, isAuthenticated } = useAuth();
+  const { username, token, isAuthenticated, logout } = useAuth();
   console.log("From nav", { username, token })
   const navigate = useNavigate();
 
   const handleLogin = () =>{
     navigate('/login')
   }
+
+  const handleLogout = () =>{
+    logout();
+    navigate('/login')
+  }
+
 
   const handleHome = () =>{
     navigate('/')
@@ -127,6 +133,7 @@ function ResponsiveAppBar(props: any) {
                           <Avatar alt="profile" src="/profile.jpg" />
 
                         </IconButton>
+                        <Button color="inherit" onClick={handleLogout}>Logout</Button>
                       </>
                     </Tooltip>
                   </>) : (
