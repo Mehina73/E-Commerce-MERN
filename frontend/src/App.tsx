@@ -4,14 +4,13 @@ import LoginPage from "./pages/LoginPage"
 import Navbar from "./components/NavBar"
 
 
-
 function App() {
 
   return (
     <BrowserRouter>
     <Navbar/>
       <Routes>
-        <Route path="/" element={<HomePage />}/>
+        <Route path="/" element={<HomePage/>}/>
         <Route path="/login" element={<LoginPage/>} />
       </Routes >
     </ BrowserRouter>
