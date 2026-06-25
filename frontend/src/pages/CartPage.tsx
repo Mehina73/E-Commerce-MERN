@@ -22,6 +22,7 @@ const CartPage = () => {
         cartItem,
         totalAmount,
         updateItemInCart,
+        removeItemFromCart
     } = useCart();
 
 
@@ -34,7 +35,7 @@ const CartPage = () => {
 
 
     const removeItem = (productId: string) => {
-        
+        removeItemFromCart(productId);
     }
 
 

@@ -44,15 +44,9 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
                     unitPrice
                 })
             );
-
-
             setCartItem(cartItemsMapped);
             setTotalAmount(cart.total)
-
         };
-
-
-
 
         fetchCart();
     }, [token]);
@@ -60,7 +54,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
 
-
+//==============================================
+    // Add Item In Cart
     const addItemToCart = async (productId: string) => {
         try {
             const response = await fetch('http://localhost:3001/cart/item', {
@@ -86,12 +81,12 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
             const cartItemsMapped = cart.items.map(
-                ({ product, quantity }: { product: any, quantity: number, unitPrice: number }) => ({
+                ({ product, quantity, unitPrice }: { product: any, quantity: number, unitPrice: number }) => ({
                     productId: product._id,
                     title: product.title,
                     image: product.image,
                     quantity,
-                    unitPrice: product.unitPrice,
+                    unitPrice
                 })
             );
 
@@ -101,14 +96,13 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         } catch (error) {
             console.error(error);
         }
-
-
-
-
     }
 
 
 
+
+//==============================================
+    // Update Item In Cart
     const updateItemInCart = async (productId: string, quantity: number) => {
         try {
             const response = await fetch('http://localhost:3001/cart/item', {
@@ -149,18 +143,55 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         } catch (error) {
             console.error(error);
         }
-
-
-
-
     }
 
 
 
+//==============================================
+    // Delete Item From Cart
+    const removeItemFromCart = async (productId: string) => {
+        try {
+            const response = await fetch(`http://localhost:3001/cart/item/${productId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+
+            if (!response.ok) {
+                setError('Failed to delete from cart');
+            }
+
+            const result = await response.json();
+            const cart = result.data;
+
+            if (!cart) {
+                setError('Failed to parse cart data')
+            }
+
+
+
+            const cartItemsMapped = cart.items.map(
+                ({ product, quantity, unitPrice }: { product: any, quantity: number, unitPrice: number }) => ({
+                    productId: product._id,
+                    title: product.title,
+                    image: product.image,
+                    quantity,
+                    unitPrice
+                })
+            );
+
+            setCartItem(cartItemsMapped);
+            setTotalAmount(cart.total)
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
 
     return (
-        <CartContext.Provider value={{ cartItem, totalAmount, addItemToCart, updateItemInCart }}>
+        <CartContext.Provider value={{ cartItem, totalAmount, addItemToCart, updateItemInCart, removeItemFromCart }}>
             {children}
         </CartContext.Provider>
 
