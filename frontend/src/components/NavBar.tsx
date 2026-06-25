@@ -51,7 +51,7 @@ function ResponsiveAppBar(props: any) {
   }
 
 const handleCart = () => {
-  navigate('/cart')
+  navigate('/mycart')
 }
 
   return (
