@@ -6,16 +6,20 @@ import {
     Typography,
     Button,
 } from "@mui/material";
+import { useCart } from "../context/Cart/CartContext";
 
 
 interface Props {
-    id: string,
+    _id: string,
     title: string,
     image: string,
     price: number
 }
 
-export default function ProductCard({ title, image, price }: Props) {
+export default function ProductCard({ _id, title, image, price }: Props) {
+
+    const { addItemToCart } = useCart();
+
     return (
         <Card sx={{ maxWidth: 320 }}>
             <CardMedia
@@ -47,7 +51,7 @@ export default function ProductCard({ title, image, price }: Props) {
             </CardContent>
 
             <CardActions>
-                <Button size="small" variant="contained">Add to Cart</Button>
+                <Button size="small" variant="contained" onClick={() => addItemToCart(_id)}>Add to Cart</Button>
                 <Button size="small">Details</Button>
             </CardActions>
         </Card>
