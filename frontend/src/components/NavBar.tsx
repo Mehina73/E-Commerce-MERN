@@ -16,6 +16,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LaptopMacIcon from "@mui/icons-material/LaptopMac";
 import { useAuth } from "../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Badge from "@mui/material/Badge";
 
 function HideOnScroll(props: { children: React.ReactElement }) {
 
@@ -35,22 +36,23 @@ function ResponsiveAppBar(props: any) {
   console.log("From nav", { username, token })
   const navigate = useNavigate();
 
-  const handleLogin = () =>{
+  const handleLogin = () => {
     navigate('/login')
   }
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     logout();
     navigate('/login')
   }
 
 
-  const handleHome = () =>{
+  const handleHome = () => {
     navigate('/')
   }
 
-
-
+const handleCart = () => {
+  navigate('/cart')
+}
 
   return (
     <>
@@ -121,8 +123,11 @@ function ResponsiveAppBar(props: any) {
                 {isAuthenticated ? (
                   <>
                     <Tooltip title="Cart">
-                      <IconButton color="inherit">
-                        <ShoppingCartIcon />
+                      <IconButton color="inherit" onClick={handleCart}>
+                        <Badge badgeContent={3} color="error">
+                          <ShoppingCartIcon />
+                        </Badge>
+
                       </IconButton>
                     </Tooltip>
 
@@ -137,7 +142,7 @@ function ResponsiveAppBar(props: any) {
                       </>
                     </Tooltip>
                   </>) : (
-                    <Button onClick={handleLogin}>Login</Button>
+                  <Button onClick={handleLogin}>Login</Button>
                 )}
 
               </Box>

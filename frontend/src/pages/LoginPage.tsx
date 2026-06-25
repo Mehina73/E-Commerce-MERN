@@ -53,7 +53,7 @@ const LoginPage = () => {
             const result = await response.json();
 
             console.log(result);
-            
+
             if (!response.ok) {
                 alert(result.data);
                 return;
@@ -61,7 +61,7 @@ const LoginPage = () => {
 
 
 
-            login(user.email, result);
+            login(user.email, result.data);
             navigate('/')
 
 
