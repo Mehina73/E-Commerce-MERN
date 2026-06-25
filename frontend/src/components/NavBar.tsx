@@ -17,6 +17,7 @@ import LaptopMacIcon from "@mui/icons-material/LaptopMac";
 import { useAuth } from "../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Badge from "@mui/material/Badge";
+import { useCart } from "../context/Cart/CartContext";
 
 function HideOnScroll(props: { children: React.ReactElement }) {
 
@@ -33,7 +34,7 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 
 function ResponsiveAppBar(props: any) {
   const { username, token, isAuthenticated, logout } = useAuth();
-  console.log("From nav", { username, token })
+  const {cartItem} = useCart();
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -50,9 +51,9 @@ function ResponsiveAppBar(props: any) {
     navigate('/')
   }
 
-const handleCart = () => {
-  navigate('/mycart')
-}
+  const handleCart = () => {
+    navigate('/mycart')
+  }
 
   return (
     <>
@@ -70,33 +71,35 @@ const handleCart = () => {
             <Toolbar disableGutters>
 
               {/* Logo + Brand */}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  mr: 5,
-                }}
-              >
-                <Avatar
+              <Button sx={{color: "#ffff"}} onClick={ () => navigate('/') }>
+                <Box
                   sx={{
-                    bgcolor: "white",
-                    color: "primary.main",
-                    mr: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    mr: 5,
                   }}
                 >
-                  <LaptopMacIcon />
-                </Avatar>
+                  <Avatar
+                    sx={{
+                      bgcolor: "white",
+                      color: "primary.main",
+                      mr: 1,
+                    }}
+                  >
+                    <LaptopMacIcon />
+                  </Avatar>
 
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    letterSpacing: 1,
-                  }}
-                >
-                  Tech Laptop
-                </Typography>
-              </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    Tech Laptop
+                  </Typography>
+                </Box>
+              </Button>
 
               {/* Navigation */}
               <Box sx={{ flexGrow: 1 }}>
@@ -124,7 +127,7 @@ const handleCart = () => {
                   <>
                     <Tooltip title="Cart">
                       <IconButton color="inherit" onClick={handleCart}>
-                        <Badge badgeContent={3} color="error">
+                        <Badge badgeContent={cartItem.length} color="error">
                           <ShoppingCartIcon />
                         </Badge>
 
