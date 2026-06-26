@@ -5,21 +5,33 @@ import Navbar from "./components/NavBar"
 import RegisterPage from "./pages/RegisterPage"
 import AuthProvider from "./context/Auth/AuthProvider"
 import CartPage from "./pages/CartPage"
+import ProtectedRoute from "./components/ProtectedRoute"
+import CartProvider from "./context/Cart/CartProvider"
+import CheckoutPage from "./pages/CheckoutPage"
+import SuccessPage from "./pages/SuccessPage"
+import MyOrdersPage from "./pages/MyOrdersPage"
 
 
 function App() {
 
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/cart" element={<CartPage />} />
-        </Routes >
-      </ BrowserRouter>
+      <CartProvider>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/mycart" element={<CartPage />} />
+              <Route path="/cart/checkout" element={<CheckoutPage />} />
+              <Route path="/cart/success" element={<SuccessPage />} />
+              <Route path="/my-orders" element={<MyOrdersPage />} />
+            </Route>
+          </Routes >
+        </ BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   )
 }

@@ -1,9 +1,8 @@
 import { Container, Grid } from "@mui/material";
 import ProductCard from "../components/ProductCard";
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "../Product";
 
-const ProductCardWithProps = ProductCard as ComponentType<Product>;
 
 const HomePage = () => {
 
