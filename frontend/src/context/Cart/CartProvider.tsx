@@ -225,11 +225,35 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
 
+    //==============================================
+    // Checkout 
+    const checkout = async (address: string) => {
+        try {
+            const response = await fetch('http://localhost:3001/cart/checkout', {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    address
+                })
+            })
 
+            if (!response.ok) {
+                setError('Failed to place order');
+            }
 
+            setCartItem([]);
+            setTotalAmount(0)
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
-        <CartContext.Provider value={{ cartItem, totalAmount, addItemToCart, updateItemInCart, removeItemFromCart, removeCart }}>
+        <CartContext.Provider value={{ cartItem, totalAmount, addItemToCart, updateItemInCart, removeItemFromCart, removeCart, checkout }}>
             {children}
         </CartContext.Provider>
 

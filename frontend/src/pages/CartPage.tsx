@@ -25,8 +25,10 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 import { useCart } from "../context/Cart/CartContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
+    const navigate = useNavigate();
     const {
         cartItem,
         totalAmount,
@@ -52,7 +54,7 @@ const CartPage = () => {
     };
 
 
-
+    // + - Quantity
     const handleQuantity = (productId: string, quantity: number) => {
         if (quantity < 1) {
             return;
@@ -60,9 +62,15 @@ const CartPage = () => {
         updateItemInCart(productId, quantity)
     }
 
-
+    // Remove item from cart
     const handleRemoveItem = (productId: string) => {
         removeItemFromCart(productId);
+    }
+
+
+
+    const handleCheckout = () => {
+        navigate('/cart/checkout')
     }
 
 
@@ -236,6 +244,8 @@ const CartPage = () => {
                             fullWidth
                             variant="contained"
                             size="large"
+                            onClick={handleCheckout}
+
                         >
                             Checkout
                         </Button>
