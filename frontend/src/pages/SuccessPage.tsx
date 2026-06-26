@@ -61,7 +61,7 @@ const SuccessPage = () => {
             variant="contained"
             size="large"
             startIcon={<ShoppingBagRoundedIcon />}
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/my-orders")}
           >
             View My Orders
           </Button>

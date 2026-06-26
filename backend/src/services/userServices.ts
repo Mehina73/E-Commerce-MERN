@@ -1,6 +1,7 @@
 import { userModel } from "../models/userModel";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { orderModel } from "../models/orderModel";
 
 interface IRegisterData {
     firstName: string;
@@ -61,6 +62,21 @@ export const userLogin = async (loginData: ILoginData) =>{
 
 }
 
+
+// Get my orders
+export const getMyOrders = async (userID: string) =>{
+
+    try{  
+
+        const myorders = await orderModel.find({userID});
+
+        return {data: myorders, status: 200};     
+        
+    }catch(err){
+        throw new Error(`Error get orders: ${err}`);
+    }
+
+}
 
 const generateJWT = (data: any) =>{
     return jwt.sign(data, process.env.JWT_SECRETE || "", {expiresIn:'24h'})

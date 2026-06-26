@@ -1,5 +1,7 @@
 import express from 'express';
-import { userLogin, userRegister } from '../services/userServices';
+import { getMyOrders, userLogin, userRegister } from '../services/userServices';
+import { validateJWT } from '../middleware/validateJWT';
+import { ExtendRequest } from '../types/extendedRequest';
 
 const router = express.Router();
 
@@ -29,6 +31,19 @@ router.post('/login', async (req,res) => {
         res.send("Invalid Email or Password")
     }
 
+})
+
+
+
+// Get my orders
+router.get('/my-orders', validateJWT, async(req: ExtendRequest,res) => {
+    try{
+        const userID = req?.user?._id;
+        const orders = await getMyOrders(userID);
+        res.status(orders.status).json(orders.data);
+    } catch(err){
+        res.status(500).send("Can't find orders")
+    }
 })
 
 export default router;
