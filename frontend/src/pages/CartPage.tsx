@@ -9,39 +9,105 @@ import {
     IconButton,
     Paper,
     Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
 } from "@mui/material";
+
+
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 import { useCart } from "../context/Cart/CartContext";
+import { useState } from "react";
 
 const CartPage = () => {
     const {
         cartItem,
         totalAmount,
         updateItemInCart,
-        removeItemFromCart
+        removeItemFromCart,
+        removeCart
     } = useCart();
+
+    // Clear Cart
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const handleClearCart = async () => {
+        await removeCart();
+        setOpenDialog(false);
+    };
+
 
 
     const handleQuantity = (productId: string, quantity: number) => {
-        if(quantity < 1){
+        if (quantity < 1) {
             return;
         }
         updateItemInCart(productId, quantity)
     }
 
 
-    const removeItem = (productId: string) => {
+    const handleRemoveItem = (productId: string) => {
         removeItemFromCart(productId);
     }
 
 
-
     return (
         <Container maxWidth="lg" sx={{ mt: 4 }}>
+
+
+
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>
+                    Clear Shopping Cart
+                </DialogTitle>
+
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to remove all items from your cart?
+                        <br />
+                        <strong>This action cannot be undone.</strong>
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions sx={{ p: 2 }}>
+                    <Button
+                        onClick={handleCloseDialog}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="error"
+                        variant="contained"
+                        startIcon={<DeleteSweepIcon />}
+                        onClick={handleClearCart}
+                    >
+                        Clear Cart
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+
             <Typography variant="h4" gutterBottom>
                 My Cart
             </Typography>
@@ -104,7 +170,7 @@ const CartPage = () => {
                                         }}
                                     >
                                         <IconButton
-                                            onClick={ () => handleQuantity(item.productId, item.quantity - 1) }
+                                            onClick={() => handleQuantity(item.productId, item.quantity - 1)}
                                         >
                                             <RemoveIcon />
                                         </IconButton>
@@ -114,7 +180,7 @@ const CartPage = () => {
                                         </Typography>
 
                                         <IconButton
-                                            onClick={ () => handleQuantity(item.productId, item.quantity + 1) }
+                                            onClick={() => handleQuantity(item.productId, item.quantity + 1)}
                                         >
                                             <AddIcon />
                                         </IconButton>
@@ -130,7 +196,7 @@ const CartPage = () => {
 
                                 <IconButton
                                     color="error"
-                                    onClick={ () => removeItem(item.productId) }
+                                    onClick={() => handleRemoveItem(item.productId)}
                                 >
                                     <DeleteIcon />
                                 </IconButton>
@@ -172,6 +238,16 @@ const CartPage = () => {
                             size="large"
                         >
                             Checkout
+                        </Button>
+
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteSweepIcon />}
+                            onClick={handleOpenDialog}
+                        >
+                            Clear Cart
                         </Button>
                     </Paper>
                 </Box>
