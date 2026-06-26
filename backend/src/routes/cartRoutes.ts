@@ -23,7 +23,7 @@ const router = express.Router();
 
 
 // Get active cart
-router.get('/', validateJWT, async (req: ExtendRequest, res) => {
+router.get('/cart', validateJWT, async (req: ExtendRequest, res) => {
     // TO DO: get userID from token once loged in
     try {
         const userID = req?.user?._id;
