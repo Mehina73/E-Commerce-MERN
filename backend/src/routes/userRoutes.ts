@@ -1,5 +1,5 @@
 import express from 'express';
-import { getMyOrders, userLogin, userRegister } from '../services/userServices';
+import { getMyOrders, updateMyProfile, userLogin, userRegister } from '../services/userServices';
 import { validateJWT } from '../middleware/validateJWT';
 import { ExtendRequest } from '../types/extendedRequest';
 
@@ -45,5 +45,34 @@ router.get('/my-orders', validateJWT, async(req: ExtendRequest,res) => {
         res.status(500).send("Can't find orders")
     }
 })
+
+
+// Get my profile
+router.get('/my-profile', validateJWT, async(req: ExtendRequest,res) => {
+    try{
+        const userID = req?.user?._id;
+        const firstName = req?.user?.firstName;
+        const lastName = req?.user?.lastName;
+        const email = req?.user?.email;
+//        const profile = await getMyProfile(userID);
+        res.status(200).json({ firstName, lastName, email });
+    } catch(err){
+        res.status(500).send("Can't find profile")
+    }
+})
+
+
+// UPDATE my profile
+router.put('/my-profile', validateJWT, async(req: ExtendRequest,res) => {
+    try{
+        const userID = req?.user?._id;
+        const {firstName, lastName, email, password} = req.body;
+        const profile = await updateMyProfile({userID, firstName, lastName, email, password});
+        res.status(profile.status).json(profile.data);
+    } catch(err){
+        res.status(500).send("Can't UPDATE profile")
+    }
+})
+
 
 export default router;

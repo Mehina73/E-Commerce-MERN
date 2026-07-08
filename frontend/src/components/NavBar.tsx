@@ -20,6 +20,7 @@ import { useAuth } from "../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/Cart/CartContext";
 import Menu from "@mui/material/Menu";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 function HideOnScroll(props: { children: React.ReactElement }) {
 
@@ -54,6 +55,10 @@ function ResponsiveAppBar(props: any) {
   const handleHome = () => {
     navigate('/')
   }
+
+  const handleProfile = () => {
+    navigate("/my-profile");
+  };
 
   const handleCart = () => {
     navigate('/mycart')
@@ -201,6 +206,15 @@ function ResponsiveAppBar(props: any) {
                       </Box>
 
                       <Divider />
+
+
+                      <MenuItem onClick={handleProfile}>
+                        <ListItemIcon>
+                          <AccountCircleIcon fontSize="small" />
+                        </ListItemIcon>
+
+                        My Profile
+                      </MenuItem>
 
                       <MenuItem onClick={handleOrders}>
                         <ListItemIcon>

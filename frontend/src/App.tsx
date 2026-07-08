@@ -10,6 +10,7 @@ import CartProvider from "./context/Cart/CartProvider"
 import CheckoutPage from "./pages/CheckoutPage"
 import SuccessPage from "./pages/SuccessPage"
 import MyOrdersPage from "./pages/MyOrdersPage"
+import MyProfilePage from "./pages/MyProfilePage"
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
               <Route path="/cart/checkout" element={<CheckoutPage />} />
               <Route path="/cart/success" element={<SuccessPage />} />
               <Route path="/my-orders" element={<MyOrdersPage />} />
+              <Route path="/my-profile" element={<MyProfilePage />} />
             </Route>
           </Routes >
         </ BrowserRouter>
