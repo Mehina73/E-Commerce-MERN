@@ -20,7 +20,7 @@ interface ProfileData {
 }
 
 const MyProfilePage = () => {
-    const { token, login } = useAuth();
+    const { login } = useAuth();
 
     const [profile, setProfile] = useState<ProfileData>({
         firstName: "",
@@ -43,9 +43,7 @@ const MyProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 const response = await fetch("http://localhost:3001/my-profile", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    credentials:"include"
                 });
 
                 const data = await response.json();
@@ -69,7 +67,7 @@ const MyProfilePage = () => {
         };
 
         fetchProfile();
-    }, [token]);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({
@@ -89,9 +87,9 @@ const MyProfilePage = () => {
         try {
             const response = await fetch("http://localhost:3001/my-profile", {
                 method: "PUT",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(form),
             });
@@ -104,8 +102,8 @@ const MyProfilePage = () => {
                 return;
             }
 
-            // Update AuthContext with new token
-            login(form.email, result);
+            // Update username in AuthContext
+            login(form.email);
 
             // Clear password field
             setProfile({

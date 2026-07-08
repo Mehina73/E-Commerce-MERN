@@ -2,31 +2,38 @@ import { useState, type FC, type PropsWithChildren } from "react";
 import { AuthContext } from "./AuthContext";
 
 const USERNAME_KEY = 'username';
-const TOKEN_KEY = 'token';
+// const TOKEN_KEY = 'token';
 
 
 const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const [username, setUsername] = useState<string | null>(localStorage.getItem(USERNAME_KEY))
-    const [token, settoken] = useState<string | null>(localStorage.getItem(TOKEN_KEY))
+    // const [token, settoken] = useState<string | null>(localStorage.getItem(TOKEN_KEY))
 
-    const login = (username: string, token: string) => {
+    const login = (username: string) => {
         setUsername(username);
-        settoken(token);
+        // settoken(token);
         localStorage.setItem(USERNAME_KEY, username);
-        localStorage.setItem(TOKEN_KEY, token);
+        // localStorage.setItem(TOKEN_KEY, token);
     }
 
-    const isAuthenticated = !!token;
+    const isAuthenticated = username !== null;
 
-    const logout = () => {
+    const logout = async () => {
+        // localStorage.removeItem(USERNAME_KEY);
+        // localStorage.removeItem(TOKEN_KEY);
+        await fetch("http://localhost:3001/logout", {
+            method: "POST",
+            credentials: "include"
+        });
+
         localStorage.removeItem(USERNAME_KEY);
-        localStorage.removeItem(TOKEN_KEY);
+
         setUsername(null);
-        settoken(null);
+        // settoken(null);
     }
 
     return (
-        <AuthContext.Provider value={{ username, token, isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ username, isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
 

@@ -28,7 +28,7 @@ interface Order {
 }
 
 const MyOrdersPage = () => {
-  const { token } = useAuth();
+  // const { token } = useAuth();
 
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -37,9 +37,7 @@ const MyOrdersPage = () => {
       const response = await fetch(
         "http://localhost:3001/my-orders",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         }
       );
 

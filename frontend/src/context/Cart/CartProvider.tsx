@@ -5,7 +5,7 @@ import { useAuth } from "../Auth/AuthContext";
 
 
 const CartProvider: FC<PropsWithChildren> = ({ children }) => {
-    const { token } = useAuth();
+    // const { token } = useAuth();
     const [cartItem, setCartItem] = useState<CartItem[]>([]);
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [error, setError] = useState('');
@@ -16,14 +16,11 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
     useEffect(() => {
-        if (!token) {
-            return;
-        }
 
 
         const fetchCart = async () => {
             const response = await fetch("http://localhost:3001/mycart", {
-                headers: { Authorization: `Bearer ${token}` }
+                credentials:"include"
             })
 
 
@@ -49,7 +46,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         };
 
         fetchCart();
-    }, [token]);
+    }, []);
 
 
 
@@ -60,9 +57,9 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         try {
             const response = await fetch('http://localhost:3001/cart/item', {
                 method: "POST",
+                credentials:"include",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ productId, quantity: 1 })
             })
@@ -107,9 +104,9 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         try {
             const response = await fetch('http://localhost:3001/cart/item', {
                 method: "PUT",
+                credentials:"include",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ productId, quantity })
             })
@@ -153,9 +150,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         try {
             const response = await fetch(`http://localhost:3001/cart/item/${productId}`, {
                 method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                credentials:"include"
             })
 
             if (!response.ok) {
@@ -198,9 +193,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         try {
             const response = await fetch('http://localhost:3001/cart/', {
                 method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                credentials:"include"
             })
 
             if (!response.ok) {
@@ -231,8 +224,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
         try {
             const response = await fetch('http://localhost:3001/cart/checkout', {
                 method: "POST",
+                credentials:"include",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({

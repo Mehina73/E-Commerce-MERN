@@ -40,6 +40,7 @@ const LoginPage = () => {
             const response = await fetch("http://localhost:3001/login",
                 {
                     method: "POST",
+                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -61,7 +62,7 @@ const LoginPage = () => {
 
 
 
-            login(user.email, result.data);
+            login(result.username);
             navigate('/')
 
 

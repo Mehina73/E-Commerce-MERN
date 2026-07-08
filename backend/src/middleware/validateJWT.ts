@@ -4,30 +4,23 @@ import { userModel } from "../models/userModel";
 import { ExtendRequest } from "../types/extendedRequest";
 
 
-export const validateJWT = (req: ExtendRequest,res: Response,next: NextFunction) => {
-    const authHeader = req.get('authorization');
+export const validateJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
+    const token = req.cookies.token;
 
-    if(!authHeader){
-        res.status(401).send("auth header was not exist");
-        return; 
+    if (!token) {
+        return res.status(401).send("Not authenticated");
     }
 
-    const token = authHeader.split(" ")[1];
-    if(!token){
-        res.status(401).send("Bearer token was not exist");
-        return; 
-    }
+    jwt.verify(token, process.env.JWT_SECRETE!, async (
+        err: jwt.VerifyErrors | null,
+        payload: string | jwt.JwtPayload | undefined) => {
 
-    jwt.verify(token, process.env.JWT_SECRETE || '', async(err,payload) => {
-        if(err){
+            
+        if (err) {
             res.status(403).send("Invalid Token");
             return;
         }
 
-        if(!payload){
-            res.status(403).send("Invalid Token payload");
-            return;            
-        }
 
         const userPayload = payload as {
             firstName: string,
@@ -35,7 +28,7 @@ export const validateJWT = (req: ExtendRequest,res: Response,next: NextFunction)
             email: string
         }
 
-        const user = await userModel.findOne({ email: userPayload.email});
+        const user = await userModel.findOne({ email: userPayload.email });
         req.user = user;
         next();
 

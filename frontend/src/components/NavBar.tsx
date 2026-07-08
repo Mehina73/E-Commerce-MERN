@@ -36,7 +36,7 @@ function HideOnScroll(props: { children: React.ReactElement }) {
 }
 
 function ResponsiveAppBar(props: any) {
-  const { username, token, isAuthenticated, logout } = useAuth();
+  const { username, isAuthenticated, logout } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const { cartItem } = useCart();
