@@ -46,6 +46,10 @@ function ResponsiveAppBar(props: any) {
     navigate('/login')
   }
 
+  const handleRegister = () => {
+    navigate('/register')
+  }
+
   const handleLogout = () => {
     logout();
     navigate('/login')
@@ -243,7 +247,10 @@ function ResponsiveAppBar(props: any) {
                       </MenuItem>
                     </Menu>
                   </>) : (
+                    <>
                   <Button onClick={handleLogin}>Login</Button>
+                  <Button onClick={handleRegister}>Register</Button>
+                  </>
                 )}
 
               </Box>

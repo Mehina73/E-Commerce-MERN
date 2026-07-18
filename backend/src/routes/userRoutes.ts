@@ -97,7 +97,7 @@ router.put('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
         }
 
         res.status(profile.status).cookie("token", profile.data, {
-            httpOnly: false,
+            httpOnly: true,
             sameSite: "lax",
             secure: false,
              maxAge: 24 * 60 * 60 * 1000

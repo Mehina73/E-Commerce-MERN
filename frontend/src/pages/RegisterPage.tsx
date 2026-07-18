@@ -69,8 +69,8 @@ const RegisterPage = () => {
 
 
 
-            login(user.email);
-            navigate('/');
+            //login(user.email);
+            navigate('/login');
 
 
 

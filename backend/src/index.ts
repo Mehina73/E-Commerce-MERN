@@ -12,14 +12,21 @@ const app = express();
 const port = 3001;
 
 app.use(express.json());
-
 app.use(cookieParser());
 
+// ============== CORS configuration ==============
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:8000"
+];
+
 app.use(cors({
-    origin: true,
+    origin: allowedOrigins,
     credentials: true,
 }));
 
+// ================================================
 mongoose.connect(process.env.DATABASE_URL || "")
 .then(()=> console.log("Connected to MongoDB"))
 .catch(()=> console.log("Failed to connect to MongoDB"));
