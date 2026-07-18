@@ -31,16 +31,28 @@ router.post('/login', async (req, res) => {
             return res.status(result.status).json(result.data);
         }
 
-        res.status(result.status).cookie("token", result.data, {
+        const tokens = result.data as {
+            accessToken: string;
+            refreshToken: string;
+            username: string;
+        };
+
+        res.status(result.status).cookie("accessToken", tokens.accessToken, {
             httpOnly: true,
             sameSite: "lax",
             secure: false, // true فى HTTPS
-            maxAge: 24 * 60 * 60 * 1000,
+            maxAge: 15 * 60 * 1000,
+        }).cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false, // true فى HTTPS
+            maxAge: 30 * 24 * 60 * 60 * 1000,
         }).json({
-            username: email
+            username: tokens.username
         });
     } catch (err) {
-        res.status(401).send("Invalid Email or Password")
+        console.error(err);
+        res.status(500).json(err);
     }
 
 })
@@ -50,7 +62,8 @@ router.post('/login', async (req, res) => {
 // Logout
 router.post("/logout", (req, res) => {
 
-    res.clearCookie("token");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
 
     res.sendStatus(200);
 
@@ -100,7 +113,7 @@ router.put('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
             httpOnly: true,
             sameSite: "lax",
             secure: false,
-             maxAge: 24 * 60 * 60 * 1000
+            maxAge: 24 * 60 * 60 * 1000
         }).json({ message: "Profile updated successfully" });
 
     } catch (err) {

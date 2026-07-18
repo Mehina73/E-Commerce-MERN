@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { env } from "./config/env";
 import express from 'express';
 import mongoose from 'mongoose';
 import userRoutes from './routes/userRoutes';
@@ -27,7 +28,7 @@ app.use(cors({
 }));
 
 // ================================================
-mongoose.connect(process.env.DATABASE_URL || "")
+mongoose.connect(env.DATABASE_URL || "")
 .then(()=> console.log("Connected to MongoDB"))
 .catch(()=> console.log("Failed to connect to MongoDB"));
 

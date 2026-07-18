@@ -2,7 +2,16 @@ import { userModel } from "../models/userModel";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { orderModel } from "../models/orderModel";
+import { sessionModel } from "../models/sessionModel";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import mongoose from "mongoose";
 
+
+
+
+
+
+// Register a new user
 interface IRegisterData {
     firstName: string;
     lastName: string;
@@ -10,20 +19,6 @@ interface IRegisterData {
     password: string;
 };
 
-interface ILoginData {
-    email: string;
-    password: string;
-}
-
-interface IUpdateProfile {
-    userID: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    password?: string;
-}
-
-// Register a new user
 export const userRegister = async ({ firstName, lastName, email, password }: IRegisterData) => {
 
     try {
@@ -45,8 +40,17 @@ export const userRegister = async ({ firstName, lastName, email, password }: IRe
 
 
 
+//=======================================================
 // Login a user
-export const userLogin = async (loginData: ILoginData) => {
+interface ILoginData {
+    email: string;
+    password: string;
+}
+// Login a user
+export const userLogin = async (
+    loginData: ILoginData,
+    ipAddress?: string,
+    userAgent?: string) => {
 
     try {
         const findUser = await userModel.findOne({ email: loginData.email });
@@ -61,7 +65,40 @@ export const userLogin = async (loginData: ILoginData) => {
             return { data: "Invalid username or password", status: 404 };
         }
 
-        return { data: generateJWT({ firstName: findUser.firstName, lastName: findUser.lastName, email: findUser.email }), status: 200 };
+        // Generate Session ID before saving
+        const sessionId = new mongoose.Types.ObjectId();
+
+        const payload = {
+            sub: findUser._id.toString(),
+            sid: sessionId.toString(),
+        };
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        const refreshTokenHash = await bcrypt.hash(
+            refreshToken,
+            10
+        );
+
+        await sessionModel.create({
+            _id: sessionId,
+            userId: findUser._id,
+            refreshTokenHash,
+            expiresAt: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+            ),
+            revoked: false,
+            ipAddress: ipAddress ?? "",
+            userAgent: userAgent ?? "",
+        });
+
+
+        return {  status: 200, data: {
+                accessToken,
+                refreshToken,
+                username: findUser.email,
+            } };
 
     } catch (err) {
         throw new Error(`Error logging in user: ${err}`);
@@ -70,6 +107,7 @@ export const userLogin = async (loginData: ILoginData) => {
 }
 
 
+//=======================================================
 // Get my orders
 export const getMyOrders = async (userID: string) => {
 
@@ -86,7 +124,17 @@ export const getMyOrders = async (userID: string) => {
 }
 
 
+//=======================================================
 // Update my profile
+interface IUpdateProfile {
+    userID: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password?: string;
+}
+
+
 export const updateMyProfile = async ({ userID, firstName, lastName, email, password }: IUpdateProfile) => {
 
     try {
