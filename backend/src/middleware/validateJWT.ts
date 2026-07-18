@@ -11,14 +11,22 @@ export const validateJWT = (req: ExtendRequest, res: Response, next: NextFunctio
         return res.status(401).send("Not authenticated");
     }
 
-    jwt.verify(token, process.env.JWT_SECRETE!, async (
+    jwt.verify(token, process.env.JWT_SECRETE!, {
+        algorithms: ["HS256"],
+    }, async (
         err: jwt.VerifyErrors | null,
         payload: string | jwt.JwtPayload | undefined) => {
 
-            
+
         if (err) {
             res.status(403).send("Invalid Token");
             return;
+        }
+
+        if (!payload || typeof payload === "string") {
+            return res.status(401).json({
+                message: "Invalid Token",
+            });
         }
 
 
@@ -28,9 +36,19 @@ export const validateJWT = (req: ExtendRequest, res: Response, next: NextFunctio
             email: string
         }
 
-        const user = await userModel.findOne({ email: userPayload.email });
-        req.user = user;
-        next();
+        try {
+            const user = await userModel.findOne({ email: userPayload.email }).select("-password");;
+
+            if (!user) {
+                return res.status(401).send("User not found");
+            }
+
+
+            req.user = user;
+            next();
+        } catch (err) {
+            res.status(500).send("Internal Server Error");
+        }
 
     })
 
