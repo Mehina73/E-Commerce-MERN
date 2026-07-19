@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
     const [user, setUser] = useState({
@@ -46,6 +46,7 @@ const RegisterPage = () => {
             const response = await fetch("http://localhost:3001/register",
                 {
                     method: "POST",
+                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -58,20 +59,15 @@ const RegisterPage = () => {
                 }
             );
 
-            const token = await response.json();
+            const data  = await response.json();
 
             if (response.ok) {
                 alert("Registration successful");
-                console.log(token);
+                login(data.username);
+                navigate("/");
             } else {
-                alert(token.message || "Registration failed");
+                alert(data.message || "Registration failed");
             }
-
-
-
-            //login(user.email);
-            navigate('/login');
-
 
 
         } catch (error) {

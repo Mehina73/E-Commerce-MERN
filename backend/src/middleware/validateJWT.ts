@@ -1,57 +1,48 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from 'jsonwebtoken'
+import { sessionModel } from "../models/sessionModel";
+import { verifyAccessToken } from "../utils/jwt";
 import { userModel } from "../models/userModel";
 import { ExtendRequest } from "../types/extendedRequest";
 
 
-export const validateJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
-    const token = req.cookies.token;
+export const validateJWT = async (req: ExtendRequest, res: Response, next: NextFunction) => {
 
-    if (!token) {
-        return res.status(401).send("Not authenticated");
-    }
+    try {
+        const accessToken = req.cookies.accessToken;
 
-    jwt.verify(token, process.env.JWT_SECRETE!, {
-        algorithms: ["HS256"],
-    }, async (
-        err: jwt.VerifyErrors | null,
-        payload: string | jwt.JwtPayload | undefined) => {
-
-
-        if (err) {
-            res.status(403).send("Invalid Token");
-            return;
+        if (!accessToken) {
+            return res.status(401).send("Authentication required");
         }
 
-        if (!payload || typeof payload === "string") {
+        const payload = verifyAccessToken(accessToken);
+
+        const session = await sessionModel.findById(payload.sid).populate({ path: "userId", select: "-password" });
+
+        // Check if the session is valid
+        if (
+            !session ||
+            session.revoked ||
+            session.expiresAt < new Date()
+        ) {
             return res.status(401).json({
-                message: "Invalid Token",
+                message: "Session expired",
             });
         }
 
-
-        const userPayload = payload as {
-            firstName: string,
-            lastName: string
-            email: string
+        // Check if the user exists
+        req.user = session.userId;
+        if (!req.user) {
+            return res.status(401).json({
+                message: "User not found",
+            });
         }
 
-        try {
-            const user = await userModel.findOne({ email: userPayload.email }).select("-password");;
-
-            if (!user) {
-                return res.status(401).send("User not found");
-            }
-
-
-            req.user = user;
-            next();
-        } catch (err) {
-            res.status(500).send("Internal Server Error");
-        }
-
-    })
-
+        next();
+    } catch (err) {
+        res.status(401).send("Invalid access token");
+    }
 
 }
+
+
 

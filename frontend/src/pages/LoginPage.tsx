@@ -53,8 +53,6 @@ const LoginPage = () => {
 
             const result = await response.json();
 
-            console.log(result);
-
             if (!response.ok) {
                 alert(result.data);
                 return;

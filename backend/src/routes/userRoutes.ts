@@ -10,8 +10,32 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     try {
         const { firstName, lastName, email, password } = req.body;
-        const result = await userRegister({ firstName, lastName, email, password })
-        res.status(result.status).json(result);
+        const result = await userRegister({ firstName, lastName, email, password }, req.ip, req.headers['user-agent']);
+
+        if (result.status !== 201) {
+            return res.status(result.status).json(result.data);
+        }
+
+        const tokens = result.data as {
+            accessToken: string;
+            refreshToken: string;
+            username: string;
+        };
+
+        res.status(result.status).cookie("accessToken", tokens.accessToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false, // true فى HTTPS
+            maxAge: 15 * 60 * 1000,
+        }).cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false, // true فى HTTPS
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        }).json({
+            username: tokens.username
+        });
+
     } catch (err) {
         throw new Error(`Error registering user: ${err}`);
     }
@@ -25,7 +49,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
-        const result = await userLogin({ email, password });
+        const result = await userLogin({ email, password },
+            req.ip,
+            req.headers["user-agent"]
+        );
 
         if (result.status !== 200) {
             return res.status(result.status).json(result.data);
@@ -51,8 +78,7 @@ router.post('/login', async (req, res) => {
             username: tokens.username
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
+        throw new Error(`Error Login user: ${err}`);
     }
 
 })
@@ -78,7 +104,7 @@ router.get('/my-orders', validateJWT, async (req: ExtendRequest, res) => {
         const orders = await getMyOrders(userID);
         res.status(orders.status).json(orders.data);
     } catch (err) {
-        res.status(500).send("Can't find orders")
+        res.status(500).send({ message: "Can't find orders" })
     }
 })
 
@@ -93,7 +119,7 @@ router.get('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
         //        const profile = await getMyProfile(userID);
         res.status(200).json({ firstName, lastName, email });
     } catch (err) {
-        res.status(500).send("Can't find profile")
+        res.status(500).send({ message: "Can't find profile" })
     }
 })
 
@@ -117,7 +143,7 @@ router.put('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
         }).json({ message: "Profile updated successfully" });
 
     } catch (err) {
-        res.status(500).send("Can't UPDATE profile")
+        res.status(500).send({ message: "Can't UPDATE profile" })
     }
 })
 

@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { IUser } from './userModel';
 
 export interface ISession extends Document {
-    userId: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId | IUser;
     refreshTokenHash: string;
     expiresAt: Date;
     revoked: boolean;

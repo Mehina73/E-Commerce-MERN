@@ -19,19 +19,57 @@ interface IRegisterData {
     password: string;
 };
 
-export const userRegister = async ({ firstName, lastName, email, password }: IRegisterData) => {
+export const userRegister = async (
+    { firstName, lastName, email, password }: IRegisterData,
+    ipAddress?: string,
+    userAgent?: string) => {
 
     try {
         const findUser = await userModel.findOne({ email: email });
 
         if (findUser) {
-            return { data: "User already exists", status: 400 };
+            return { status: 400, data: "User already exists", };
         }
 
         const hashedpass = await bcrypt.hash(password, 12);
         const newUser = new userModel({ firstName, lastName, email, password: hashedpass });
         await newUser.save();
-        return { data: generateJWT({ firstName, lastName, email }), status: 201 };
+
+        // Create Session
+        const sessionId = new mongoose.Types.ObjectId();
+
+        const payload = {
+            sub: newUser._id.toString(),
+            sid: sessionId.toString(),
+        };
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        const refreshTokenHash = await bcrypt.hash(
+            refreshToken,
+            10
+        );
+
+        await sessionModel.create({
+            _id: sessionId,
+            userId: newUser._id,
+            refreshTokenHash,
+            expiresAt: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+            ),
+            revoked: false,
+            ipAddress: ipAddress ?? "",
+            userAgent: userAgent ?? "",
+        });
+
+        return {
+            status: 201, data: {
+                accessToken,
+                refreshToken,
+                username: newUser.email,
+            }
+        };
     } catch (err) {
         throw new Error(`Error registering user: ${err}`);
     }
@@ -94,11 +132,13 @@ export const userLogin = async (
         });
 
 
-        return {  status: 200, data: {
+        return {
+            status: 200, data: {
                 accessToken,
                 refreshToken,
                 username: findUser.email,
-            } };
+            }
+        };
 
     } catch (err) {
         throw new Error(`Error logging in user: ${err}`);

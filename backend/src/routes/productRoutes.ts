@@ -10,7 +10,7 @@ router.get('/products', async (req, res) => {
         const result = await getAllProducts()
         res.send(result);
     } catch (error) {
-        res.send("Something went wrong").status(500)
+        res.status(500).send({message: "Something went wrong"})
     }
 
 
@@ -24,7 +24,7 @@ router.post('/products', async (req, res) => {
         const result = await createNewProduct(data);
         res.send(result)
     } catch (error) {
-        res.send("Something went wrong").status(500)
+        res.status(500).send({message: "Something went wrong"})
     }
 
 
@@ -38,7 +38,7 @@ router.get('/products/:id', async (req, res) => {
         const result = await getProductById(id)
         res.send(result);
     } catch (error) {
-        res.send("Something went wrong").status(500)
+        res.status(500).send({message: "Something went wrong"})
     }
 
 
@@ -53,7 +53,7 @@ router.put('/products/:id', async (req, res) => {
         const result = await updateProduct(id, data)
         res.send(result);
     } catch (error) {
-        res.send("Something went wrong").status(500)
+        res.status(500).send({message: "Something went wrong"})
     }
 
 
@@ -68,7 +68,7 @@ router.delete('/products/:id', async (req, res) => {
         res.send(result);
 
     } catch (error) {
-        res.send("Something went wrong").status(500)
+        res.status(500).send({message: "Something went wrong"})
     }
 
 })

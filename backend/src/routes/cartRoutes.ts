@@ -30,7 +30,7 @@ router.get('/mycart', validateJWT, async (req: ExtendRequest, res) => {
         const cart = await getActiveCartForUser({ userID, populateProduct: true });
         res.send(cart);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 
@@ -46,7 +46,7 @@ router.post('/cart/item', validateJWT, async (req: ExtendRequest, res) => {
         const item = await addItemToCart({ userID, productId, quantity });
         res.send(item);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 
@@ -61,7 +61,7 @@ router.put('/cart/item', validateJWT, async (req: ExtendRequest, res) => {
         const item = await updateItemToCart({ userID, productId, quantity });
         res.send(item);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 
@@ -75,7 +75,7 @@ router.delete('/cart/item/:id', validateJWT, async (req: ExtendRequest, res) => 
         const item = await deleteItemFromCart({ userID, productId });
         res.send(item);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 
@@ -88,7 +88,7 @@ router.delete('/cart', validateJWT, async (req: ExtendRequest, res) => {
         const item = await deleteAllItems({ userID });
         res.send(item);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 
@@ -104,7 +104,7 @@ router.post('/cart/checkout', validateJWT, async (req: ExtendRequest, res) => {
         const response = await checkout({ userID, address });
         res.status(response.statusCode).send(response.data);
     } catch (err) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send({message: "Something went wrong"});
     }
 
 })
