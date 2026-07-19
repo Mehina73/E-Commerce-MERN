@@ -2,6 +2,8 @@ import express from 'express';
 import { getMyOrders, updateMyProfile, userLogin, userRegister } from '../services/userServices';
 import { validateJWT } from '../middleware/validateJWT';
 import { ExtendRequest } from '../types/extendedRequest';
+import { verifyRefreshToken } from '../utils/jwt';
+import { sessionModel } from '../models/sessionModel';
 
 const router = express.Router();
 
@@ -86,13 +88,60 @@ router.post('/login', async (req, res) => {
 
 
 // Logout
-router.post("/logout", (req, res) => {
+router.post('/logout', async (req, res) => {
+    try {
 
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+        const refreshToken = req.cookies.refreshToken;
 
-    res.sendStatus(200);
+        if (!refreshToken) {
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken');
 
+            return res.status(200).json({
+                message: 'Logged out successfully'
+            });
+        }
+
+        try {
+
+            // Verify Refresh Token
+            const payload = verifyRefreshToken(refreshToken);
+
+            // Revoke Session
+            await sessionModel.findByIdAndUpdate(
+                payload.sid,
+                {
+                    revoked: true,
+                }
+            );
+
+        } catch {
+
+        }
+
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+        });
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+        });
+
+        return res.status(200).json({
+            message: 'Logged out successfully'
+        });
+
+    } catch (err) {
+
+        return res.status(500).json({
+            message: 'Internal Server Error'
+        });
+
+    }
 });
 
 
