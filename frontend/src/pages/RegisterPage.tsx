@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
     const [user, setUser] = useState({

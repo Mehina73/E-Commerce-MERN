@@ -5,6 +5,7 @@ import { orderModel } from "../models/orderModel";
 import { sessionModel } from "../models/sessionModel";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 import mongoose from "mongoose";
+import { createUserSession } from "../utils/session";
 
 
 
@@ -35,40 +36,14 @@ export const userRegister = async (
         const newUser = new userModel({ firstName, lastName, email, password: hashedpass });
         await newUser.save();
 
-        // Create Session
-        const sessionId = new mongoose.Types.ObjectId();
-
-        const payload = {
-            sub: newUser._id.toString(),
-            sid: sessionId.toString(),
-        };
-
-        const accessToken = generateAccessToken(payload);
-        const refreshToken = generateRefreshToken(payload);
-
-        const refreshTokenHash = await bcrypt.hash(
-            refreshToken,
-            10
+        // Create user session and generate tokens
+        const tokens = await createUserSession(
+            newUser,
+            ipAddress,
+            userAgent
         );
-
-        await sessionModel.create({
-            _id: sessionId,
-            userId: newUser._id,
-            refreshTokenHash,
-            expiresAt: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-            ),
-            revoked: false,
-            ipAddress: ipAddress ?? "",
-            userAgent: userAgent ?? "",
-        });
-
         return {
-            status: 201, data: {
-                accessToken,
-                refreshToken,
-                username: newUser.email,
-            }
+            status: 201, data: tokens
         };
     } catch (err) {
         throw new Error(`Error registering user: ${err}`);
@@ -94,50 +69,23 @@ export const userLogin = async (
         const findUser = await userModel.findOne({ email: loginData.email });
 
         if (!findUser) {
-            return { data: "Invalid username or password", status: 404 };
+            return { status: 404, data: "Invalid username or password" };
         }
-
 
         const passMatch = await bcrypt.compare(loginData.password, findUser.password)
         if (!passMatch) {
-            return { data: "Invalid username or password", status: 404 };
+            return { status: 404, data: "Invalid username or password" };
         }
 
-        // Generate Session ID before saving
-        const sessionId = new mongoose.Types.ObjectId();
-
-        const payload = {
-            sub: findUser._id.toString(),
-            sid: sessionId.toString(),
-        };
-
-        const accessToken = generateAccessToken(payload);
-        const refreshToken = generateRefreshToken(payload);
-
-        const refreshTokenHash = await bcrypt.hash(
-            refreshToken,
-            10
+        // Create user session and generate tokens
+        const tokens = await createUserSession(
+            findUser,
+            ipAddress,
+            userAgent
         );
 
-        await sessionModel.create({
-            _id: sessionId,
-            userId: findUser._id,
-            refreshTokenHash,
-            expiresAt: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000
-            ),
-            revoked: false,
-            ipAddress: ipAddress ?? "",
-            userAgent: userAgent ?? "",
-        });
-
-
         return {
-            status: 200, data: {
-                accessToken,
-                refreshToken,
-                username: findUser.email,
-            }
+            status: 200, data: tokens
         };
 
     } catch (err) {
@@ -155,7 +103,7 @@ export const getMyOrders = async (userID: string) => {
 
         const myorders = await orderModel.find({ userID });
 
-        return { data: myorders, status: 200 };
+        return { status: 200, data: myorders };
 
     } catch (err) {
         throw new Error(`Error get orders: ${err}`);
