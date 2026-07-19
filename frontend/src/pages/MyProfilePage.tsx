@@ -103,7 +103,7 @@ const MyProfilePage = () => {
             }
 
             // Update username in AuthContext
-            login(form.email);
+            login(result.username);
 
             // Clear password field
             setProfile({

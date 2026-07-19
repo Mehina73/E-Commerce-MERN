@@ -125,27 +125,63 @@ router.get('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
 
 
 // UPDATE my profile
-router.put('/my-profile', validateJWT, async (req: ExtendRequest, res) => {
-    try {
-        const userID = req?.user?._id;
-        const { firstName, lastName, email, password } = req.body;
-        const profile = await updateMyProfile({ userID, firstName, lastName, email, password });
+router.put("/my-profile", validateJWT, async (req: ExtendRequest, res) => {
 
-        if (profile.status !== 200) {
-            return res.status(profile.status).json(profile.data);
+    try {
+
+        const result = await updateMyProfile({
+            userID: req.user!._id.toString(),
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            password: req.body.password,
+            ipAddress: req.ip ?? "",
+            userAgent: req.headers["user-agent"] ?? "",
+        });
+
+        if (result.status != 200) {
+            return res.status(result.status).json({
+                message: result.data,
+            });
         }
 
-        res.status(profile.status).cookie("token", profile.data, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: false,
-            maxAge: 24 * 60 * 60 * 1000
-        }).json({ message: "Profile updated successfully" });
+        const data = result.data as {
+            username: string;
+            accessToken: string | null;
+            refreshToken: string | null;
+            tokensUpdated: boolean;
+        };
+
+        if (data.tokensUpdated) {
+
+            res.cookie("accessToken", data.accessToken!, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false,
+                maxAge: 15 * 60 * 1000,
+            });
+
+            res.cookie("refreshToken", data.refreshToken!, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false,
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+            });
+
+        }
+
+        return res.status(200).json({
+            username: data.username,
+            message: "Profile updated successfully",
+        });
 
     } catch (err) {
-        res.status(500).send({ message: "Can't UPDATE profile" })
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
     }
-})
+
+});
 
 
 export default router;

@@ -120,14 +120,19 @@ interface IUpdateProfile {
     lastName: string;
     email: string;
     password?: string;
+
+    ipAddress: string;
+    userAgent: string;
 }
 
 
-export const updateMyProfile = async ({ userID, firstName, lastName, email, password }: IUpdateProfile) => {
+export const updateMyProfile = async ({ userID, firstName, lastName, email, password, ipAddress, userAgent }: IUpdateProfile & {
+    ipAddress?: string;
+    userAgent?: string;
+}) => {
 
     try {
         const user = await userModel.findById(userID);
-
 
         if (!user) {
             return {
@@ -150,27 +155,55 @@ export const updateMyProfile = async ({ userID, firstName, lastName, email, pass
             };
         }
 
+        const emailChanged = user.email !== email;
+        let passwordChanged = false;
+
         user.firstName = firstName;
         user.lastName = lastName;
         user.email = email;
 
         if (password && password.trim() !== "") {
             user.password = await bcrypt.hash(password, 12);
+            passwordChanged = true;
         }
 
         await user.save();
 
+        if (!emailChanged && !passwordChanged) {
+
+            return {
+                status: 200,
+                data: {
+                    username: user.email,
+                    accessToken: null,
+                    refreshToken: null,
+                    tokensUpdated: false,
+                },
+            };
+
+        }
+
+        await sessionModel.updateMany(
+            { userId: user._id },
+            { revoked: true }
+        );
+
+        const tokens = await createUserSession(
+            user,
+            ipAddress,
+            userAgent
+        );
+
         return {
-            status: 200, data: generateJWT({ firstName: user.firstName, lastName: user.lastName, email: user.email })
+            status: 200,
+            data: {
+                ...tokens,
+                tokensUpdated: true,
+            },
         };
 
     } catch (err) {
         throw new Error(`Error updating profile: ${err}`);
     }
 
-}
-
-
-const generateJWT = (data: any) => {
-    return jwt.sign(data, process.env.JWT_SECRETE || "", { expiresIn: '24h' })
 }
