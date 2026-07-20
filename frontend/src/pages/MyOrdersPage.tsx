@@ -12,6 +12,7 @@ import {
 import Inventory2RoundedIcon from "@mui/icons-material/Inventory2Rounded";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
+import { authFetch } from "../api/authFetch";
 
 interface OrderItem {
   productName: string;
@@ -34,11 +35,8 @@ const MyOrdersPage = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const response = await fetch(
-        "http://localhost:3001/my-orders",
-        {
-          credentials: "include",
-        }
+      const response = await authFetch(
+        "http://localhost:3001/my-orders"
       );
 
       const data = await response.json();

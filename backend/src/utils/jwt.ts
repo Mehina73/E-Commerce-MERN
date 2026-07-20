@@ -18,7 +18,7 @@ export interface JWTPayload {
 
 export const generateAccessToken = (payload: JWTPayload): string => {
     return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m",
+        expiresIn: "1m",
         algorithm: "HS256",
     });
 };

@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../api/authFetch";
 
 const RegisterPage = () => {
     const [user, setUser] = useState({
@@ -43,10 +44,9 @@ const RegisterPage = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:3001/register",
+            const response = await authFetch("http://localhost:3001/register",
                 {
                     method: "POST",
-                    credentials: "include",
                     headers: {
                         "Content-Type": "application/json",
                     },

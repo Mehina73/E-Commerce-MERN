@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { orderModel } from "../models/orderModel";
 import { sessionModel } from "../models/sessionModel";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt";
 import mongoose from "mongoose";
 import { createUserSession } from "../utils/session";
 
@@ -207,3 +207,103 @@ export const updateMyProfile = async ({ userID, firstName, lastName, email, pass
     }
 
 }
+
+
+
+
+
+
+//=======================================================
+// Refresh Access Token
+export const refreshAccessToken = async (
+    refreshToken?: string
+) => {
+
+    try {
+
+        if (!refreshToken) {
+            return {
+                status: 401,
+                data: "Authentication required",
+            };
+        }
+
+        // Verify JWT
+        const payload = verifyRefreshToken(refreshToken);
+
+        // Find Session
+        const session = await sessionModel.findById(payload.sid);
+
+        if (
+            !session ||
+            session.revoked ||
+            session.expiresAt < new Date()
+        ) {
+
+            return {
+                status: 401,
+                data: "Session expired",
+            };
+
+        }
+
+        // Compare Refresh Token
+        const validRefreshToken = await bcrypt.compare(
+            refreshToken,
+            session.refreshTokenHash
+        );
+
+        if (!validRefreshToken) {
+
+            session.revoked = true;
+            await session.save();
+
+            return {
+                status: 401,
+                data: "Invalid session",
+            };
+
+        }
+
+        // Find User
+        const user = await userModel.findById(payload.sub);
+
+        if (!user) {
+
+            session.revoked = true;
+            await session.save();
+
+            return {
+                status: 401,
+                data: "User not found",
+            };
+
+        }
+
+        // Update Last Used
+        session.lastUsedAt = new Date();
+        await session.save();
+
+        // Generate New Access Token
+        const accessToken = generateAccessToken({
+            sub: user._id.toString(),
+            sid: session._id.toString(),
+        });
+
+        return {
+            status: 200,
+            data: {
+                accessToken,
+            },
+        };
+
+    } catch (err) {
+
+        return {
+            status: 401,
+            data: "Invalid refresh token",
+        };
+
+    }
+
+};

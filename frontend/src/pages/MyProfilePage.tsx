@@ -11,6 +11,7 @@ import {
 import PersonIcon from "@mui/icons-material/Person";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/Auth/AuthContext";
+import { authFetch } from "../api/authFetch";
 
 interface ProfileData {
     firstName: string;
@@ -42,9 +43,7 @@ const MyProfilePage = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch("http://localhost:3001/my-profile", {
-                    credentials:"include"
-                });
+                const response = await authFetch("http://localhost:3001/my-profile");
 
                 const data = await response.json();
 
@@ -85,9 +84,8 @@ const MyProfilePage = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:3001/my-profile", {
+            const response = await authFetch("http://localhost:3001/my-profile", {
                 method: "PUT",
-                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },

@@ -1,9 +1,11 @@
 import express from 'express';
-import { getMyOrders, updateMyProfile, userLogin, userRegister } from '../services/userServices';
+import { getMyOrders, refreshAccessToken, updateMyProfile, userLogin, userRegister } from '../services/userServices';
 import { validateJWT } from '../middleware/validateJWT';
 import { ExtendRequest } from '../types/extendedRequest';
-import { verifyRefreshToken } from '../utils/jwt';
+import { generateAccessToken, verifyRefreshToken } from '../utils/jwt';
 import { sessionModel } from '../models/sessionModel';
+import { userModel } from '../models/userModel';
+import bcrypt from 'bcrypt';
 
 const router = express.Router();
 
@@ -28,7 +30,7 @@ router.post('/register', async (req, res) => {
             httpOnly: true,
             sameSite: "lax",
             secure: false, // true فى HTTPS
-            maxAge: 15 * 60 * 1000,
+            maxAge: 1 * 60 * 1000,
         }).cookie("refreshToken", tokens.refreshToken, {
             httpOnly: true,
             sameSite: "lax",
@@ -70,7 +72,7 @@ router.post('/login', async (req, res) => {
             httpOnly: true,
             sameSite: "lax",
             secure: false, // true فى HTTPS
-            maxAge: 15 * 60 * 1000,
+            maxAge: 1 * 60 * 1000,
         }).cookie("refreshToken", tokens.refreshToken, {
             httpOnly: true,
             sameSite: "lax",
@@ -232,5 +234,47 @@ router.put("/my-profile", validateJWT, async (req: ExtendRequest, res) => {
 
 });
 
+
+
+
+
+
+
+
+
+router.post("/refresh-token", async (req, res) => {
+    try {
+
+        const result = await refreshAccessToken(
+            req.cookies.refreshToken
+        );
+
+        if (result.status !== 200) {
+            return res.status(result.status).json(result.data);
+        }
+
+        const data = result.data as {
+            accessToken: string;
+        };
+
+        res.cookie("accessToken", data.accessToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 15 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            message: "Access token refreshed",
+        });
+
+    } catch (err) {
+
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+
+    }
+});
 
 export default router;

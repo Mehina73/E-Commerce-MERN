@@ -2,6 +2,7 @@ import { useEffect, useState, type FC, type PropsWithChildren } from "react";
 import { CartContext } from "./CartContext";
 import type { CartItem } from "../../types/CartItem";
 import { useAuth } from "../Auth/AuthContext";
+import { authFetch } from "../../api/authFetch";
 
 
 const CartProvider: FC<PropsWithChildren> = ({ children }) => {
@@ -19,10 +20,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
 
         const fetchCart = async () => {
-            const response = await fetch("http://localhost:3001/mycart", {
-                credentials:"include"
-            })
-
+            const response = await authFetch("http://localhost:3001/mycart");
 
             if (!response.ok) {
                 setError("Failed to fetch user cart. Please try again");
@@ -55,9 +53,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     // Add Item In Cart
     const addItemToCart = async (productId: string) => {
         try {
-            const response = await fetch('http://localhost:3001/cart/item', {
+            const response = await authFetch('http://localhost:3001/cart/item', {
                 method: "POST",
-                credentials:"include",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -102,9 +99,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     // Update Item In Cart
     const updateItemInCart = async (productId: string, quantity: number) => {
         try {
-            const response = await fetch('http://localhost:3001/cart/item', {
+            const response = await authFetch('http://localhost:3001/cart/item', {
                 method: "PUT",
-                credentials:"include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -148,9 +144,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     // Delete Item From Cart
     const removeItemFromCart = async (productId: string) => {
         try {
-            const response = await fetch(`http://localhost:3001/cart/item/${productId}`, {
-                method: "DELETE",
-                credentials:"include"
+            const response = await authFetch(`http://localhost:3001/cart/item/${productId}`, {
+                method: "DELETE"
             })
 
             if (!response.ok) {
@@ -191,9 +186,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     // Delete Cart 
     const removeCart = async () => {
         try {
-            const response = await fetch('http://localhost:3001/cart/', {
-                method: "DELETE",
-                credentials:"include"
+            const response = await authFetch('http://localhost:3001/cart/', {
+                method: "DELETE"
             })
 
             if (!response.ok) {
@@ -222,9 +216,8 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
     // Checkout 
     const checkout = async (address: string) => {
         try {
-            const response = await fetch('http://localhost:3001/cart/checkout', {
+            const response = await authFetch('http://localhost:3001/cart/checkout', {
                 method: "POST",
-                credentials:"include",
                 headers: {
                     "Content-Type": "application/json"
                 },

@@ -1,5 +1,6 @@
 import { useState, type FC, type PropsWithChildren } from "react";
 import { AuthContext } from "./AuthContext";
+import { authFetch } from "../../api/authFetch";
 
 const USERNAME_KEY = 'username';
 // const TOKEN_KEY = 'token';
@@ -21,9 +22,8 @@ const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
     const logout = async () => {
         // localStorage.removeItem(USERNAME_KEY);
         // localStorage.removeItem(TOKEN_KEY);
-        await fetch("http://localhost:3001/logout", {
-            method: "POST",
-            credentials: "include"
+        await authFetch("http://localhost:3001/logout", {
+            method: "POST"
         });
 
         localStorage.removeItem(USERNAME_KEY);
